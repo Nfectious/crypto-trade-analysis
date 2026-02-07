@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=${APP_NAME:-Simple Crypto Data API}
+      - API_PREFIX=${API_PREFIX:-/api/v1}
+      - DEFAULT_EXCHANGE=${DEFAULT_EXCHANGE:-binance}
+      - DEFAULT_MARKET_TYPE=${DEFAULT_MARKET_TYPE:-spot}
+      - ENABLE_RATE_LIMIT=${ENABLE_RATE_LIMIT:-true}
+    volumes:
+      - ./src:/app/src
