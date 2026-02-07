@@ -13,7 +13,10 @@ logger = get_logger(__name__)
 # Create FastAPI app
 app = FastAPI(
     title=settings.app_name,
-    description="Professional FastAPI service for cryptocurrency market data and technical indicators",
+    description=(
+        "Professional FastAPI service for cryptocurrency market data "
+        "and technical indicators"
+    ),
     version="0.1.0",
 )
 

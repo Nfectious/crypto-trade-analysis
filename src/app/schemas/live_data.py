@@ -1,7 +1,7 @@
 """Pydantic schemas for live data API."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -9,11 +9,11 @@ from pydantic import BaseModel, Field
 class LatestIndicators(BaseModel):
     """Latest technical indicator values."""
 
-    ema_20: Optional[float] = Field(None, description="20-period EMA")
-    ema_50: Optional[float] = Field(None, description="50-period EMA")
-    ema_200: Optional[float] = Field(None, description="200-period EMA")
-    rsi_14: Optional[float] = Field(None, description="14-period RSI")
-    atr_14: Optional[float] = Field(None, description="14-period ATR")
+    ema_20: float | None = Field(None, description="20-period EMA")
+    ema_50: float | None = Field(None, description="50-period EMA")
+    ema_200: float | None = Field(None, description="200-period EMA")
+    rsi_14: float | None = Field(None, description="14-period RSI")
+    atr_14: float | None = Field(None, description="14-period ATR")
 
 
 class Candle(BaseModel):
@@ -25,11 +25,11 @@ class Candle(BaseModel):
     low: float = Field(..., description="Lowest price")
     close: float = Field(..., description="Closing price")
     volume: float = Field(..., description="Trading volume")
-    ema_20: Optional[float] = Field(None, description="20-period EMA")
-    ema_50: Optional[float] = Field(None, description="50-period EMA")
-    ema_200: Optional[float] = Field(None, description="200-period EMA")
-    rsi_14: Optional[float] = Field(None, description="14-period RSI")
-    atr_14: Optional[float] = Field(None, description="14-period ATR")
+    ema_20: float | None = Field(None, description="20-period EMA")
+    ema_50: float | None = Field(None, description="50-period EMA")
+    ema_200: float | None = Field(None, description="200-period EMA")
+    rsi_14: float | None = Field(None, description="14-period RSI")
+    atr_14: float | None = Field(None, description="14-period ATR")
 
 
 class LiveDataResponse(BaseModel):

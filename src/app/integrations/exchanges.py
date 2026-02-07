@@ -59,7 +59,9 @@ class ExchangeClient:
         logger.info(
             f"Fetching {limit} {timeframe} candles for {symbol} from {self.exchange_name}"
         )
-        return self._exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+        return self._exchange.fetch_ohlcv(  # type: ignore[no-any-return]
+            symbol, timeframe=timeframe, limit=limit
+        )
 
     def get_exchange_name(self) -> str:
         """Get the exchange name."""

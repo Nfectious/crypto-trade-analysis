@@ -1,5 +1,6 @@
 """Technical indicators calculation using the ta library."""
 
+import math
 from typing import Any
 
 import pandas as pd
@@ -52,6 +53,6 @@ def clean_value(value: Any) -> Any:
 
     Converts NaN and infinity to None.
     """
-    if pd.isna(value) or (isinstance(value, float) and not pd.api.types.is_finite(value)):
+    if pd.isna(value) or (isinstance(value, float) and not math.isfinite(value)):
         return None
     return value

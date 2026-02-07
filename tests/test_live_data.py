@@ -56,7 +56,7 @@ def test_live_data_endpoint_smoke() -> None:
         assert "Network error" in response.json()["detail"]
     else:
         # Other errors should be investigated
-        assert False, f"Unexpected status code: {response.status_code}"
+        raise AssertionError(f"Unexpected status code: {response.status_code}")
 
 
 def test_live_data_with_custom_parameters() -> None:
@@ -76,4 +76,4 @@ def test_live_data_with_custom_parameters() -> None:
         # Network error is acceptable
         pass
     else:
-        assert False, f"Unexpected status code: {response.status_code}"
+        raise AssertionError(f"Unexpected status code: {response.status_code}")
