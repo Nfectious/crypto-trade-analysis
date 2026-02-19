@@ -54,6 +54,11 @@ async def websocket_live_data(
 
     Streams live market data with technical indicators at regular intervals.
     The client receives a JSON payload every `interval` seconds.
+
+    Error Handling:
+    - NetworkError and ExchangeError: Sends error message and retries after interval
+    - ValueError (invalid parameters): Sends error message and closes connection
+    - Other exceptions: Sends error message and retries after interval
     """
     await websocket.accept()
     logger.info(

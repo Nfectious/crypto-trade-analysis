@@ -150,7 +150,7 @@ Streams real-time market data with technical indicators at regular intervals.
 
 **Example Connection:**
 ```javascript
-const ws = new WebSocket("ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=5");
+const ws = new WebSocket("ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&timeframe=1h&interval=5");
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);

@@ -4,8 +4,6 @@ These tests use monkeypatch to stub ExchangeClient.fetch_ohlcv with synthetic OH
 data to ensure deterministic and reliable CI testing without network calls.
 """
 
-from typing import Any
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -14,10 +12,14 @@ from app.main import app
 
 client = TestClient(app)
 
+# Type alias for OHLCV candle data: [timestamp, open, high, low, close, volume]
+OHLCVCandle = list[int | float]
+OHLCVData = list[OHLCVCandle]
+
 
 def generate_synthetic_ohlcv(
     count: int, base_price: float = 40000.0, base_timestamp: int = 1704067200000
-) -> list[list[Any]]:
+) -> OHLCVData:
     """
     Generate synthetic OHLCV data for testing.
 
@@ -61,7 +63,7 @@ def test_live_data_endpoint_mocked(monkeypatch: pytest.MonkeyPatch) -> None:
     # Mock the fetch_ohlcv method
     def mock_fetch_ohlcv(
         self: ExchangeClient, symbol: str, timeframe: str, limit: int
-    ) -> list[list[Any]]:
+    ) -> OHLCVData:
         return synthetic_ohlcv
 
     monkeypatch.setattr(ExchangeClient, "fetch_ohlcv", mock_fetch_ohlcv)
@@ -124,7 +126,7 @@ def test_live_data_with_custom_parameters_mocked(monkeypatch: pytest.MonkeyPatch
     # Mock the fetch_ohlcv method
     def mock_fetch_ohlcv(
         self: ExchangeClient, symbol: str, timeframe: str, limit: int
-    ) -> list[list[Any]]:
+    ) -> OHLCVData:
         return synthetic_ohlcv[:limit]
 
     monkeypatch.setattr(ExchangeClient, "fetch_ohlcv", mock_fetch_ohlcv)
@@ -153,7 +155,7 @@ def test_live_data_insufficient_data_for_indicators(monkeypatch: pytest.MonkeyPa
 
     def mock_fetch_ohlcv(
         self: ExchangeClient, symbol: str, timeframe: str, limit: int
-    ) -> list[list[Any]]:
+    ) -> OHLCVData:
         return synthetic_ohlcv
 
     monkeypatch.setattr(ExchangeClient, "fetch_ohlcv", mock_fetch_ohlcv)
@@ -185,7 +187,7 @@ def test_live_data_network_error_mocked(monkeypatch: pytest.MonkeyPatch) -> None
     # Mock the fetch_ohlcv method to raise NetworkError
     def mock_fetch_ohlcv_network_error(
         self: ExchangeClient, symbol: str, timeframe: str, limit: int
-    ) -> list[list[Any]]:
+    ) -> OHLCVData:
         raise ccxt.NetworkError("Simulated network error")
 
     monkeypatch.setattr(ExchangeClient, "fetch_ohlcv", mock_fetch_ohlcv_network_error)
@@ -205,7 +207,7 @@ def test_live_data_exchange_error_mocked(monkeypatch: pytest.MonkeyPatch) -> Non
     # Mock the fetch_ohlcv method to raise ExchangeError
     def mock_fetch_ohlcv_exchange_error(
         self: ExchangeClient, symbol: str, timeframe: str, limit: int
-    ) -> list[list[Any]]:
+    ) -> OHLCVData:
         raise ccxt.ExchangeError("Invalid symbol")
 
     monkeypatch.setattr(ExchangeClient, "fetch_ohlcv", mock_fetch_ohlcv_exchange_error)
