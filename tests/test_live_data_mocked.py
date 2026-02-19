@@ -3,6 +3,7 @@
 These tests use mocked exchange data to ensure CI reliability without network dependencies.
 """
 
+from collections.abc import Generator
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -53,7 +54,7 @@ def generate_synthetic_ohlcv(num_candles: int = 250) -> list[list[Any]]:
 
 
 @pytest.fixture
-def mock_exchange_client() -> Any:
+def mock_exchange_client() -> Generator[MagicMock, None, None]:
     """Fixture to create a mocked ExchangeClient."""
     with patch("app.services.market_data.ExchangeClient") as mock_client_class:
         mock_instance = MagicMock()

@@ -54,7 +54,7 @@ check_untyped_defs = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["ccxt.*", "ta.*", "pandas.*"]
+module = ["ccxt.*", "ta.*"]
 ignore_missing_imports = true
 disable_error_code = ["no-any-return"]
 
