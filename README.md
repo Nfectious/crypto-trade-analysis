@@ -7,9 +7,10 @@ A professional, production-ready FastAPI service for fetching cryptocurrency OHL
 - 🚀 **FastAPI** - Modern, fast web framework for building APIs
 - 📊 **Technical Indicators** - EMA (20, 50, 200), RSI (14), ATR (14)
 - 🔌 **Multi-Exchange Support** - Powered by ccxt library
+- 🔄 **WebSocket Streaming** - Real-time data updates via WebSocket
 - 🐳 **Docker Ready** - Easy deployment with Docker and docker-compose
 - ✅ **Type Safe** - Full type hints with mypy strict mode
-- 🧪 **Tested** - Comprehensive test suite with pytest
+- 🧪 **Tested** - Comprehensive test suite with pytest (including mocked tests)
 - 📝 **Well Documented** - Clear API documentation with FastAPI's built-in docs
 
 ## Quick Start
@@ -123,9 +124,48 @@ curl "http://localhost:8000/api/v1/live_data?symbol=BTC/USDT&timeframe=1h&limit=
     "rsi_14": 55.3,
     "atr_14": 150.2
   },
-  "meta": {}
+  "meta": {
+    "defaultType": "spot"
+  }
 }
 ```
+
+### WebSocket Live Data Stream
+```bash
+WS /api/v1/live_data/ws
+```
+
+**Query Parameters:**
+- `symbol` (string, default: "BTC/USDT") - Trading pair symbol
+- `timeframe` (string, default: "1h") - Candle timeframe
+- `limit` (integer, default: 250, range: 20-2000) - Number of candles to fetch
+- `exchange` (string, default: "binance") - Exchange name
+- `interval` (integer, default: 30, range: 5-300) - Update interval in seconds
+
+**Description:**
+Streams live market data at regular intervals. The server will send updated candle data every `interval` seconds.
+
+**Example (using websocat):**
+```bash
+websocat "ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=10"
+```
+
+**Example (using JavaScript):**
+```javascript
+const ws = new WebSocket("ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=10");
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log("Received update:", data);
+};
+
+ws.onerror = (error) => {
+  console.error("WebSocket error:", error);
+};
+```
+
+**Response Format:**
+Same as the REST endpoint - sends the full LiveDataResponse object every interval.
 
 **Note about null values:** Technical indicators may return `null` for early candles where there isn't enough historical data to calculate the indicator. For example:
 - EMA-20 requires at least 20 candles
@@ -193,7 +233,8 @@ crypto-trade-analysis/
 │       │   ├── __init__.py
 │       │   └── v1/
 │       │       ├── __init__.py
-│       │       └── routes_live_data.py  # Live data endpoints
+│       │       ├── routes_live_data.py  # REST endpoints
+│       │       └── ws_live_data.py      # WebSocket endpoint
 │       ├── core/
 │       │   ├── __init__.py
 │       │   ├── config.py        # Application settings
@@ -211,7 +252,8 @@ crypto-trade-analysis/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_health.py
-│   └── test_live_data.py
+│   ├── test_live_data.py
+│   └── test_live_data_mocked.py  # Mocked tests for CI
 ├── .github/
 │   └── workflows/
 │       └── ci.yml              # GitHub Actions CI
