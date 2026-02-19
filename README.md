@@ -134,6 +134,40 @@ curl "http://localhost:8000/api/v1/live_data?symbol=BTC/USDT&timeframe=1h&limit=
 - RSI-14 requires at least 14 candles
 - ATR-14 requires at least 14 candles
 
+### WebSocket Live Data Stream
+```
+WS /api/v1/live_data/ws
+```
+
+Streams real-time market data with technical indicators at regular intervals.
+
+**Query Parameters:**
+- `symbol` (string, default: "BTC/USDT") - Trading pair symbol
+- `timeframe` (string, default: "1h") - Candle timeframe (e.g., "1m", "5m", "1h", "1d")
+- `limit` (integer, default: 250, range: 20-2000) - Number of candles to fetch
+- `exchange` (string, default: "binance") - Exchange name
+- `interval` (integer, default: 5, range: 1-60) - Update interval in seconds
+
+**Example Connection:**
+```javascript
+const ws = new WebSocket("ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=5");
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log("Received:", data);
+};
+```
+
+The WebSocket will send a JSON payload every `interval` seconds with the same structure as the REST API response. If there's an error fetching data, the WebSocket will send an error object instead:
+
+```json
+{
+  "error": "network_error",
+  "message": "Network error connecting to exchange: ...",
+  "status_code": 503
+}
+```
+
 ## Technical Indicators
 
 The API calculates the following technical indicators using the `ta` library:
@@ -193,7 +227,8 @@ crypto-trade-analysis/
 │       │   ├── __init__.py
 │       │   └── v1/
 │       │       ├── __init__.py
-│       │       └── routes_live_data.py  # Live data endpoints
+│       │       ├── routes_live_data.py  # REST API endpoints
+│       │       └── ws_live_data.py      # WebSocket endpoints
 │       ├── core/
 │       │   ├── __init__.py
 │       │   ├── config.py        # Application settings
@@ -211,7 +246,8 @@ crypto-trade-analysis/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_health.py
-│   └── test_live_data.py
+│   ├── test_live_data.py
+│   └── test_live_data_mocked.py  # Mocked tests for CI
 ├── .github/
 │   └── workflows/
 │       └── ci.yml              # GitHub Actions CI
