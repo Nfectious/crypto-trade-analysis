@@ -13,7 +13,11 @@ logger = get_logger(__name__)
 
 
 def process_ohlcv_data(
-    ohlcv_data: list[list[Any]], symbol: str, timeframe: str, exchange_name: str
+    ohlcv_data: list[list[Any]],
+    symbol: str,
+    timeframe: str,
+    exchange_name: str,
+    meta: dict[str, Any] | None = None,
 ) -> LiveDataResponse:
     """
     Process raw OHLCV data and calculate indicators.
@@ -92,7 +96,7 @@ def process_ohlcv_data(
         candles_count=len(df),
         recent_candles=recent_candles,
         latest_indicators=latest_indicators,
-        meta={},
+        meta=meta or {},
     )
 
     return response
@@ -120,12 +124,16 @@ def fetch_live_data(
     # Fetch OHLCV data
     ohlcv_data = exchange_client.fetch_ohlcv(symbol=symbol, timeframe=timeframe, limit=limit)
 
+    # Get exchange metadata
+    meta = exchange_client.get_meta_info()
+
     # Process the data
     response = process_ohlcv_data(
         ohlcv_data=ohlcv_data,
         symbol=symbol,
         timeframe=timeframe,
         exchange_name=exchange_client.get_exchange_name(),
+        meta=meta,
     )
 
     return response
