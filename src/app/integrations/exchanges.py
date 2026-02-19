@@ -66,3 +66,11 @@ class ExchangeClient:
     def get_exchange_name(self) -> str:
         """Get the exchange name."""
         return self.exchange_name
+
+    def get_meta_info(self) -> dict[str, Any]:
+        """Get metadata about the exchange configuration."""
+        meta: dict[str, Any] = {}
+        if hasattr(self._exchange, "options") and isinstance(self._exchange.options, dict):
+            if "defaultType" in self._exchange.options:
+                meta["default_type"] = self._exchange.options["defaultType"]
+        return meta
