@@ -25,6 +25,7 @@ dev = [
     "ruff>=0.3",
     "mypy>=1.8",
     "types-requests",
+    "pandas-stubs",
 ]
 
 [tool.setuptools.packages.find]

@@ -127,6 +127,50 @@ curl "http://localhost:8000/api/v1/live_data?symbol=BTC/USDT&timeframe=1h&limit=
 }
 ```
 
+### Live Market Data (WebSocket)
+```bash
+WS /api/v1/live_data/ws
+```
+
+**Query Parameters:**
+- `symbol` (string, default: "BTC/USDT") - Trading pair symbol
+- `timeframe` (string, default: "1h") - Candle timeframe
+- `limit` (integer, default: 250) - Number of candles to fetch
+- `exchange` (string, default: "binance") - Exchange name
+- `interval` (integer, default: 5) - Update interval in seconds
+
+**Example Usage (JavaScript):**
+```javascript
+const ws = new WebSocket('ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=5');
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (data.error) {
+    console.error('Error:', data.detail);
+  } else {
+    console.log('Last price:', data.last_price);
+    console.log('Indicators:', data.latest_indicators);
+  }
+};
+```
+
+**Example Usage (Python):**
+```python
+import asyncio
+import websockets
+import json
+
+async def stream_data():
+    uri = "ws://localhost:8000/api/v1/live_data/ws?symbol=BTC/USDT&interval=5"
+    async with websockets.connect(uri) as websocket:
+        while True:
+            message = await websocket.recv()
+            data = json.loads(message)
+            print(f"Last price: {data.get('last_price')}")
+
+asyncio.run(stream_data())
+```
+
 **Note about null values:** Technical indicators may return `null` for early candles where there isn't enough historical data to calculate the indicator. For example:
 - EMA-20 requires at least 20 candles
 - EMA-50 requires at least 50 candles
@@ -193,7 +237,8 @@ crypto-trade-analysis/
 │       │   ├── __init__.py
 │       │   └── v1/
 │       │       ├── __init__.py
-│       │       └── routes_live_data.py  # Live data endpoints
+│       │       ├── routes_live_data.py  # Live data REST endpoints
+│       │       └── ws_live_data.py      # Live data WebSocket endpoint
 │       ├── core/
 │       │   ├── __init__.py
 │       │   ├── config.py        # Application settings
@@ -211,7 +256,8 @@ crypto-trade-analysis/
 ├── tests/
 │   ├── __init__.py
 │   ├── test_health.py
-│   └── test_live_data.py
+│   ├── test_live_data.py
+│   └── test_live_data_mocked.py  # Mocked tests for CI
 ├── .github/
 │   └── workflows/
 │       └── ci.yml              # GitHub Actions CI
