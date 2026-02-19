@@ -25,6 +25,7 @@ dev = [
     "ruff>=0.3",
     "mypy>=1.8",
     "types-requests",
+    "pandas-stubs",
 ]
 
 [tool.setuptools.packages.find]
@@ -53,7 +54,7 @@ check_untyped_defs = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["ccxt.*", "ta.*"]
+module = ["ccxt.*", "ta.*", "pandas"]
 ignore_missing_imports = true
 disable_error_code = ["no-any-return"]
 
