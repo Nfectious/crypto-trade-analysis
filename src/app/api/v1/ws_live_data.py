@@ -59,6 +59,9 @@ async def websocket_live_data(
         f"WebSocket connection established: {symbol} {timeframe} interval={interval}s"
     )
 
+    consecutive_errors = 0
+    max_consecutive_errors = 5
+
     try:
         while True:
             try:
@@ -78,31 +81,62 @@ async def websocket_live_data(
                 await websocket.send_json(data)
                 logger.debug(f"Sent data update for {symbol}")
 
+                # Reset error counter on success
+                consecutive_errors = 0
+
                 # Wait for the specified interval
                 await asyncio.sleep(interval)
 
             except ccxt.NetworkError as e:
-                logger.error(f"Network error: {e}")
+                consecutive_errors += 1
+                logger.error(
+                    f"Network error ({consecutive_errors}/{max_consecutive_errors}): {e}"
+                )
                 await websocket.send_json(
                     {
                         "error": "network_error",
                         "detail": f"Network error connecting to exchange: {str(e)}",
                     }
                 )
+                if consecutive_errors >= max_consecutive_errors:
+                    logger.error(
+                        f"Max consecutive errors reached ({max_consecutive_errors}), "
+                        "closing connection"
+                    )
+                    break
                 await asyncio.sleep(interval)
 
             except ccxt.ExchangeError as e:
-                logger.error(f"Exchange error: {e}")
+                consecutive_errors += 1
+                logger.error(
+                    f"Exchange error ({consecutive_errors}/{max_consecutive_errors}): {e}"
+                )
                 await websocket.send_json(
                     {"error": "exchange_error", "detail": f"Exchange error: {str(e)}"}
                 )
+                if consecutive_errors >= max_consecutive_errors:
+                    logger.error(
+                        f"Max consecutive errors reached ({max_consecutive_errors}), "
+                        "closing connection"
+                    )
+                    break
                 await asyncio.sleep(interval)
 
             except Exception as e:
-                logger.error(f"Unexpected error: {e}", exc_info=True)
+                consecutive_errors += 1
+                logger.error(
+                    f"Unexpected error ({consecutive_errors}/{max_consecutive_errors}): {e}",
+                    exc_info=True,
+                )
                 await websocket.send_json(
                     {"error": "internal_error", "detail": f"Internal error: {str(e)}"}
                 )
+                if consecutive_errors >= max_consecutive_errors:
+                    logger.error(
+                        f"Max consecutive errors reached ({max_consecutive_errors}), "
+                        "closing connection"
+                    )
+                    break
                 await asyncio.sleep(interval)
 
     except WebSocketDisconnect:
