@@ -138,10 +138,11 @@ def test_live_data_endpoint_mocked_nan_handling(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that NaN and infinite values are properly converted to None."""
-    # Create minimal data (not enough for all indicators)
+    # Create minimal data (25 candles - insufficient for EMA-50 and EMA-200)
+    # Early EMA values may be calculated but will be less accurate
     minimal_data = []
     base_timestamp = 1704067200000
-    for i in range(25):  # Only 25 candles - not enough for EMA-50 or EMA-200
+    for i in range(25):
         timestamp = base_timestamp + (i * 3600000)
         minimal_data.append([timestamp, 43000.0, 43100.0, 42900.0, 43050.0, 100.0])
 

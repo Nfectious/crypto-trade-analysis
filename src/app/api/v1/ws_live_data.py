@@ -80,6 +80,7 @@ async def websocket_live_data(
                 logger.debug(f"Sent data update: {symbol} @ {response.last_price}")
 
                 # Wait for next interval or check for close message
+                # TimeoutError is expected when no message arrives during interval
                 try:
                     # Use asyncio.wait_for to check for messages during wait
                     message = await asyncio.wait_for(
